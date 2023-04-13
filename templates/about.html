@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gaussian Naive Bayes Data Mining App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">GNB App   |</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/metrics">Metrics</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact">Contact Us</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Jumbotron -->
+    <div class="jumbotron">
+        <hr class="my-4">
+            <h1 class="display-4">Scope and Limitation</h1>
+                <p>
+                    The scope of the Students Board Examination Performance Forecasting System using data mining is to provide a predictive tool for assessing the performance of students on board examinations. Specifically, the system will accept records related to the student's information, such as the general weighted average (GWA) and the pre-board LET examination. Using data mining techniques like Gaussian Naive Bayes, the system will analyze the data set and generate forecasting reports, which will enable educators to identify areas of improvement and tailor their teaching methods to better meet student needs. The focus on forecasting reports can help teachers and students develop targeted study plans and provide early intervention for students who may be struggling.
+
+                    However, the system has certain limitations. The use of only a naive Bayes algorithm may not provide the most accurate forecasts, as this algorithm assumes that all variables are independent, which may not be the case. Additionally, the system's reliance on only two pieces of information, the student's general weighted average and pre-board examination scores, may not be sufficient to provide a comprehensive view of a student's abilities and potential for success. Therefore, other relevant data points, such as demographic information or previous academic performance, could be incorporated to provide a more complete picture of student performance.
+
+                    Another limitation of the system is that it is designed only for the use of the Cebu Technological University—San Francisco Campus, and may not be applicable to other institutions. Moreover, the accuracy of the system may be affected by factors such as changes in the examination format or curriculum, which may render the forecasting model outdated. Therefore, the system should be updated regularly to ensure its accuracy and applicability to changing circumstances. Furthermore, the proposed web application should be designed with data privacy and security concerns in mind, and appropriate measures should be implemented to protect sensitive student information.
+
+                    In conclusion, while the Student Board Examination Performance Forecasting System using data mining has the potential to provide valuable insights into student performance, it should be used in conjunction with other assessment methods to provide a more complete picture of a student's abilities and potential for success. The system's limitations and potential areas for improvement should be taken into account when interpreting its forecasts, and the system should be regularly updated to ensure its accuracy and applicability to changing circumstances.
+                </p>
+
+      <hr class="my-4">
+        <h1 class="display-4">FAQs</h1>
+          
+            <h2>What is metrics in Gaussian Naive Bayes?</h2>
+            <p>In Gaussian Naive Bayes, metrics refer to the evaluation measures used to assess the performance of the algorithm. These metrics can include measures such as accuracy, precision, recall, F1-score, and confusion matrix. They are typically used to compare the predicted class labels with the actual class labels and to determine how well the algorithm has learned to distinguish between different classes. By analyzing these metrics, one can gain insights into the strengths and weaknesses of the model and make any necessary adjustments to improve its performance.</p>
+
+            <h2>What is Gaussian Naive Bayes?</h2>
+            <p>Gaussian Naive Bayes is a probabilistic machine learning algorithm that utilizes Data Mining Technique to make predictions based on the likelihood of each feature given the class label.</p>
+            
+            <h2>How Does It Work?</h2>
+            <p>The algorithm calculates the probability of each feature given the class label using the Gaussian distribution, and then combines these probabilities to make a prediction.</p>
+            
+            <h2>How to Use the App?</h2>
+            <ol>
+              <li>Select the "Get Started" button to start.</li>
+              <li>Input your data like general weighted average (GWA) and the pre-board LET examination.</li>
+              <li>Click the "Analyze" button to perform the forecasting.</li>
+            </ol>
+
+    </div>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p>&copy; 2023 Students Board Examination Performance Forecasting System</p>
+          </div>
+          <!-- <div class="col-md-6 text-right">
+            <p>Contact Us</p>
+          </div> -->
+        </div>
+     

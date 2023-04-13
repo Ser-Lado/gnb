@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  </head>
+  <body style="background-color: #0e0e48; color: white;">
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          {% if error %}
+            <div class="alert alert-danger" role="alert">
+              {{ error }}
+            </div>
+          {% endif %}
+          <form action="{{ url_for('register') }}" method="POST" class="border rounded p-4">
+            <h2 class="mb-4">Create Account</h2>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" name="username" id="username" class="form-control" required aria-label="Enter your username">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" id="password" class="form-control" required aria-label="Enter your password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <br>
+            <p>Have an account?</p>
+            <a href="{{ url_for('login') }}">Login</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+      // Form validation
+      const form = document.querySelector('form');
+      form.addEventListener('submit', (event) => {
+        const usernameInput = document.querySelector('#username');
+        const passwordInput = document.querySelector('#password');
+        if (!usernameInput.value || !passwordInput.value) {
+          event.preventDefault();
+          alert('Please enter a valid username and password');
+        }
+      });
+    </script>
+  </body>
+
+  
+</html>
