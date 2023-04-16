@@ -39,54 +39,30 @@
       <p class="lead">This app allows you to perform Gaussian Naive Bayes classification on your data.</p>
       <hr class="my-4">
 
-      <h3>Enter the students data:</h3>
-      <br>
-      <form action="/analyze" method="post">
-          
-          <input type="number" step=".01" id="GWA" name="GWA" placeholder="General Weighted Average : 1.0 - 3.0" required max="3.0">
-          <br>
-          <input type="number" step=".1" id="preBoardLETscore" placeholder="General Average of Pre-board LET Examination Score : 0 - 100" name="preBoardLETscore" required max="100">
-          <br>
-          <input type="submit" class="btn" value="Analyze">
-      </form>
-      <br>
-      <hr class="my-4">
-
-
-        <h1>Upload a CSV file to forecast batch of students.</h1>
-        {% if message %}
-          <p style="color: red;">{{ message }}</p>
-        {% endif %}
-        <form method="post" action="/upload" enctype="multipart/form-data">
-          <input type="file" name="file" id="fileInput" required accept=".csv" onchange="validateFile()">
-          {% if file_error %}
-            <p style="color: red;">{{ file_error }}</p>
-          {% endif %}
-          <br><br>
-          <input type="submit" class="btn" value="Upload and Analyze" id="submitBtn" disabled>
-        </form>
-        
-        <script>
-        function validateFile() {
-          var allowedExtensions = /(\.csv)$/i;
-          var fileInput = document.getElementById('fileInput');
-          var submitBtn = document.getElementById('submitBtn');
-          if (!allowedExtensions.exec(fileInput.value)) {
-            fileInput.value = ''; // Clear the file input field
-            alert('Invalid file format. Only CSV files are allowed.');
-            submitBtn.disabled = true; // Disable the submit button
-          } else {
-            submitBtn.disabled = false; // Enable the submit button
-          }
-        }
-        </script>
-        <br>
+        <center><h1>Below are the results of the CSV file uploaded.</h1></center>
         <hr class="my-4">
-        <h3>Error on analyzing students data?</h3>
-        <p>Download the CSV file template <a href="{{ url_for('static', filename='uploadBatchTemp.csv') }}" download>here</a>.</p>
-        
+        <h2>Forecasting Reports:</h2>
+        <table>
+          <tr>
+            <th>Student</th>
+            <th>Prediction</th>
+          </tr>
+          {% for prediction in predictions%}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ prediction }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        <hr class="my-4">
+        <h2>Analysis:</h2>
+        {{ group_by_predictions|safe }}
+        <hr class="my-4">
+        <br>
+        <a class="btn btn-primary btn-lg" href="/getstarted" role="button">Analyze New Dataset</a>
 
-   </div>
+ 
+    </div>
 
     <!-- Main Content -->
     <div class="container">

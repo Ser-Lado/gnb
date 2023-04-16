@@ -9,10 +9,10 @@ html { width: 100%; height:100%; overflow:visible; }
   background-color: #4CAF50; /* Green */
   border: none;
   color: white;
-  width: 10%;
+  width: 15%;
   text-align: center;
   text-decoration: none;
-
+  
   font-size: 18px;
   cursor: pointer;
   border-radius: 10px;

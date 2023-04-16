@@ -7,10 +7,12 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import plotly.graph_objs as go
 import bcrypt
-
+import io
+from joblib import load
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from sklearn.model_selection import train_test_split
+
 
 
 
@@ -41,6 +43,7 @@ from sklearn.model_selection import train_test_split
 # Declare a Flask app
 app = Flask(__name__) #Initialize the flask App
 app.secret_key = 'secret_key'
+app.config['UPLOAD_FOLDER'] = 'batchCSV'
 
 # SQLite database connection for GRAPH
 conn = sqlite3.connect('data.db', check_same_thread=False)
@@ -107,105 +110,162 @@ def index():
 
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
-    gnb = train_model()
-    GWA = request.form['GWA']
-    preBoardLETscore = request.form['preBoardLETscore']
-    input_data = [[float(GWA), float(preBoardLETscore)]]
-    outcome = gnb.predict(input_data)[0]
+    # Check if the user is logged in
+    if 'username' in session:
+        gnb = train_model()
+        GWA = request.form['GWA']
+        preBoardLETscore = request.form['preBoardLETscore']
+        input_data = [[float(GWA), float(preBoardLETscore)]]
+        outcome = gnb.predict(input_data)[0]
 
-    # code that retrieves the values of "GWA" and "preBoardLETscore"
-    gwa = request.args.get('GWA')
-    preBoardLETscore = request.args.get('preBoardLETscore')
-   
-
-
-    #for graph ############################################
-    # Get user input from the HTML form
-    GWA = float(request.form['GWA'])
-    preBoardLETscore = float(request.form['preBoardLETscore'])
-    
-    # Load data from SQLite database
-    df = pd.read_sql_query("SELECT * FROM datasets", conn)
-
-    # Split the data into features and target variable
-    X = df[['GWA', 'preBoardLETscore']]
-    y = df['outcome']
-
-    # Train the model using Gaussian Naive Bayes algorithm
-    gnb = GaussianNB()
-    gnb.fit(X, y)
-
-    # Make a prediction using user input
-    prediction_input = pd.DataFrame([[GWA, preBoardLETscore]], columns=X.columns)
-    prediction = gnb.predict(prediction_input)
-
-    # Load data from SQLite database
-    df = pd.read_sql_query("SELECT * FROM datasets", conn)
-
-    # Plot a scatter plot of the data using Plotly
-    fig = px.scatter(df, x='GWA', y='preBoardLETscore', color='outcome')
-
-    # get data from database
-    df = get_data_from_db()
-    # preprocess data and train model
-    model = preprocess_and_train_model(df)
-    # handle form submission   
-    if request.method == 'POST':
-        # get user input
-        gwa = float(request.form.get('GWA'))
-        preboard = float(request.form.get('preBoardLETscore'))
-        # make prediction using trained model
-        prediction = model.predict([[gwa, preboard]])
-        # group data by prediction and count occurrences
-        data = df.groupby('outcome')['outcome'].count()
-        # generate bar chart
-        chart = generate_bar_chart(data)
-      
+        # code that retrieves the values of "GWA" and "preBoardLETscore"
+        gwa = request.args.get('GWA')
+        preBoardLETscore = request.args.get('preBoardLETscore')
     
 
-    # Display the prediction in the HTML page
-    return render_template('analyze.html', outcome=outcome, prediction=prediction[0], graphJSON=fig.to_json(), chart=chart,  GWA=GWA, preBoardLETscore=preBoardLETscore)
+
+        #for graph ############################################
+        # Get user input from the HTML form
+        GWA = float(request.form['GWA'])
+        preBoardLETscore = float(request.form['preBoardLETscore'])
+        
+        # Load data from SQLite database
+        df = pd.read_sql_query("SELECT * FROM datasets", conn)
+
+        # Split the data into features and target variable
+        X = df[['GWA', 'preBoardLETscore']]
+        y = df['outcome']
+
+        # Train the model using Gaussian Naive Bayes algorithm
+        gnb = GaussianNB()
+        gnb.fit(X, y)
+
+        # Make a prediction using user input
+        prediction_input = pd.DataFrame([[GWA, preBoardLETscore]], columns=X.columns)
+        prediction = gnb.predict(prediction_input)
+
+        # Load data from SQLite database
+        df = pd.read_sql_query("SELECT * FROM datasets", conn)
+
+        # Plot a scatter plot of the data using Plotly
+        fig = px.scatter(df, x='GWA', y='preBoardLETscore', color='outcome')
+
+        # get data from database
+        df = get_data_from_db()
+        # preprocess data and train model
+        model = preprocess_and_train_model(df)
+        # handle form submission   
+        if request.method == 'POST':
+            # get user input
+            gwa = float(request.form.get('GWA'))
+            preboard = float(request.form.get('preBoardLETscore'))
+            # make prediction using trained model
+            prediction = model.predict([[gwa, preboard]])
+            # group data by prediction and count occurrences
+            data = df.groupby('outcome')['outcome'].count()
+            # generate bar chart
+            chart = generate_bar_chart(data)
+        
+        # Display the prediction in the HTML page
+        return render_template('analyze.html', outcome=outcome, prediction=prediction[0], graphJSON=fig.to_json(), chart=chart,  GWA=GWA, preBoardLETscore=preBoardLETscore)
+    else:
+        # If the user is not logged in, redirect them to the login page
+        return redirect(url_for('login'))
 
 
-    # return render_template('predict.html', outcome=outcome)
+
+    #define a route for the upload page
+    @app.route('/upload', methods=['POST'])
+    def upload():
+
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return render_template('home.html', message='No file selected')
+
+        # get the file from the post request
+        file = request.files['file']
+
+        # if the user does not select a file, the browser submits an empty file without a filename
+        if file.filename == '':
+            return render_template('home.html', message='No file selected')
+
+
+        # read the CSV file
+        data = pd.read_csv(file)
+
+        # Load data from SQLite database
+        df = pd.read_sql_query("SELECT * FROM datasets", conn)
+
+        # Split the data into features and target variable
+        X = df[['GWA', 'preBoardLETscore']]
+        y = df['outcome']
+
+        # Train the model using Gaussian Naive Bayes algorithm
+        gnb = GaussianNB()
+        gnb.fit(X, y)
+
+        # extract the necessary features
+        features = data[['GWA', 'preBoardLETscore']]
+
+        # predict the classes using the Gaussian Naive Bayes model
+        predictions = gnb.predict(features)
+
+        # convert the predictions to a list
+        predictions = predictions.tolist()
+
+        # combine the predictions with the original data
+        data['predictions'] = predictions
+
+        # group the data by predictions and calculate the count and percentage
+        group_by_predictions = data.groupby('predictions').agg({'predictions': 'count'})
+        group_by_predictions.rename(columns={'predictions': 'count'}, inplace=True)
+        group_by_predictions['percentage'] = group_by_predictions['count'] / data.shape[0] * 100
+
+        # render the results page with the predictions and analysis
+        return render_template('batchresultanalysis.html', predictions=predictions, group_by_predictions=group_by_predictions.to_html())
+
 
 
 
 # Define the route for displaying the evaluation metrics
 @app.route('/metrics')
 def metrics():
-    # Load data from SQLite database
-    df = pd.read_sql_query("SELECT * FROM datasets", conn)
+    # Check if the user is logged in
+    if 'username' in session:
+        # Load data from SQLite database
+        df = pd.read_sql_query("SELECT * FROM datasets", conn)
 
-    # Split the data into features and target variable
-    X = df[['GWA', 'preBoardLETscore']]
-    y = df['outcome']
+        # Split the data into features and target variable
+        X = df[['GWA', 'preBoardLETscore']]
+        y = df['outcome']
 
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Train the model using Gaussian Naive Bayes algorithm
-    gnb = GaussianNB()
-    gnb.fit(X_train, y_train)
+        # Train the model using Gaussian Naive Bayes algorithm
+        gnb = GaussianNB()
+        gnb.fit(X_train, y_train)
 
-    # Make predictions on the testing set
-    y_pred = gnb.predict(X_test)
+        # Make predictions on the testing set
+        y_pred = gnb.predict(X_test)
 
-    # Calculate evaluation metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, pos_label='PASSED')
-    recall = recall_score(y_test, y_pred, pos_label='PASSED')
-    f1 = f1_score(y_test, y_pred, pos_label='PASSED')
+        # Calculate evaluation metrics
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, pos_label='PASSED')
+        recall = recall_score(y_test, y_pred, pos_label='PASSED')
+        f1 = f1_score(y_test, y_pred, pos_label='PASSED')
 
-    # Calculate evaluation metrics as percentages instead of decimal numbers
-    percentagesaccuracy = round(accuracy_score(y_test, y_pred) * 100, 2)
-    percentagesprecision = round(precision_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
-    percentagesrecall = round(recall_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
-    percentagesf1 = round(f1_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
+        # Calculate evaluation metrics as percentages instead of decimal numbers
+        percentagesaccuracy = round(accuracy_score(y_test, y_pred) * 100, 2)
+        percentagesprecision = round(precision_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
+        percentagesrecall = round(recall_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
+        percentagesf1 = round(f1_score(y_test, y_pred, pos_label='PASSED') * 100, 2)
 
-    # Render the evaluation metrics template with the metric scores as variables
-    return render_template('metrics.html', accuracy=accuracy, precision=precision, recall=recall, f1=f1, percentagesaccuracy=percentagesaccuracy, percentagesprecision=percentagesprecision, percentagesrecall=percentagesrecall, percentagesf1=percentagesf1)
-
+        # Render the evaluation metrics template with the metric scores as variables
+        return render_template('metrics.html', accuracy=accuracy, precision=precision, recall=recall, f1=f1, percentagesaccuracy=percentagesaccuracy, percentagesprecision=percentagesprecision, percentagesrecall=percentagesrecall, percentagesf1=percentagesf1)
+    else:
+        # If the user is not logged in, redirect them to the login page
+        return redirect(url_for('login'))
 
 
 # Navigations ################################333333

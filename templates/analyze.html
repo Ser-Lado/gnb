@@ -19,7 +19,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item">
@@ -34,6 +34,15 @@
         </ul>
       </div>
     </nav>
+  
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  
+    <!-- Popper.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  
+    <!-- Bootstrap JS library -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <!-- Jumbotron -->
     <div class="jumbotron">
@@ -93,6 +102,10 @@
                 {% if chart %}
                 {{ chart|safe }}
                 {% endif %}
+                
+                <hr class="my-4">
+                <br>
+                <a class="btn btn-primary btn-lg" href="/getstarted" role="button">Analyze New Dataset</a>
 
     </div>
 
