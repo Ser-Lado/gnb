@@ -10,9 +10,9 @@ import bcrypt
 import io
 from joblib import load
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+import numpy as np
 from sklearn.model_selection import train_test_split
-
+from collections import Counter
 
 
 
@@ -108,27 +108,11 @@ def index():
         return redirect(url_for('login'))
     
 
+
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
     # Check if the user is logged in
     if 'username' in session:
-        gnb = train_model()
-        GWA = request.form['GWA']
-        preBoardLETscore = request.form['preBoardLETscore']
-        input_data = [[float(GWA), float(preBoardLETscore)]]
-        outcome = gnb.predict(input_data)[0]
-
-        # code that retrieves the values of "GWA" and "preBoardLETscore"
-        gwa = request.args.get('GWA')
-        preBoardLETscore = request.args.get('preBoardLETscore')
-    
-
-
-        #for graph ############################################
-        # Get user input from the HTML form
-        GWA = float(request.form['GWA'])
-        preBoardLETscore = float(request.form['preBoardLETscore'])
-        
         # Load data from SQLite database
         df = pd.read_sql_query("SELECT * FROM datasets", conn)
 
@@ -140,89 +124,94 @@ def analyze():
         gnb = GaussianNB()
         gnb.fit(X, y)
 
-        # Make a prediction using user input
-        prediction_input = pd.DataFrame([[GWA, preBoardLETscore]], columns=X.columns)
-        prediction = gnb.predict(prediction_input)
-
-        # Load data from SQLite database
-        df = pd.read_sql_query("SELECT * FROM datasets", conn)
-
-        # Plot a scatter plot of the data using Plotly
-        fig = px.scatter(df, x='GWA', y='preBoardLETscore', color='outcome')
-
-        # get data from database
-        df = get_data_from_db()
-        # preprocess data and train model
-        model = preprocess_and_train_model(df)
-        # handle form submission   
         if request.method == 'POST':
-            # get user input
-            gwa = float(request.form.get('GWA'))
-            preboard = float(request.form.get('preBoardLETscore'))
-            # make prediction using trained model
-            prediction = model.predict([[gwa, preboard]])
-            # group data by prediction and count occurrences
+            # Get user input from the HTML form
+            GWA = float(request.form['GWA'])
+            preBoardLETscore = float(request.form['preBoardLETscore'])
+            input_data = [[GWA, preBoardLETscore]]
+            outcome = gnb.predict(input_data)[0]
+
+            # Make a prediction using user input
+            prediction = gnb.predict(input_data)[0]
+
+            # Calculate the probability of the predicted outcome
+            outcome_prob = gnb.predict_proba(input_data)[0]
+            outcome_percentage = "{:.2%}".format(outcome_prob.max())
+
+            # Group data by outcome and count occurrences
             data = df.groupby('outcome')['outcome'].count()
-            # generate bar chart
+
+            # Plot a scatter plot of the data using Plotly
+            fig = px.scatter(df, x='GWA', y='preBoardLETscore', color='outcome')
+
+            # Generate bar chart of outcome occurrences
             chart = generate_bar_chart(data)
-        
-        # Display the prediction in the HTML page
-        return render_template('analyze.html', outcome=outcome, prediction=prediction[0], graphJSON=fig.to_json(), chart=chart,  GWA=GWA, preBoardLETscore=preBoardLETscore)
+
+            # Render the HTML template with the prediction and chart
+            return render_template('analyze.html', outcome=outcome, prediction=prediction, outcome_percentage=outcome_percentage, graphJSON=fig.to_json(), chart=chart,  GWA=GWA, preBoardLETscore=preBoardLETscore)
+        else:
+            # Render the HTML template with empty form
+            return render_template('analyze.html')
     else:
         # If the user is not logged in, redirect them to the login page
         return redirect(url_for('login'))
 
 
 
-    #define a route for the upload page
-    @app.route('/upload', methods=['POST'])
-    def upload():
+# define a route for the upload page
+@app.route('/upload', methods=['POST'])
+def upload():
 
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            return render_template('home.html', message='No file selected')
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        return render_template('home.html', message='No file selected')
 
-        # get the file from the post request
-        file = request.files['file']
+    # get the file from the post request
+    file = request.files['file']
 
-        # if the user does not select a file, the browser submits an empty file without a filename
-        if file.filename == '':
-            return render_template('home.html', message='No file selected')
+    # if the user does not select a file, the browser submits an empty file without a filename
+    if file.filename == '':
+        return render_template('home.html', message='No file selected')
+
+    # read the CSV file
+    data = pd.read_csv(file)
+
+    # Load data from SQLite database
+    df = pd.read_sql_query("SELECT * FROM datasets", conn)
+
+    # Split the data into features and target variable
+    X = df[['GWA', 'preBoardLETscore']]
+    y = df['outcome']
+
+    # Train the model using Gaussian Naive Bayes algorithm
+    gnb = GaussianNB()
+    gnb.fit(X, y)
+
+    # extract the necessary features
+    features = data[['GWA', 'preBoardLETscore']]
+
+    # predict the classes and probabilities using the Gaussian Naive Bayes model
+    predictions = gnb.predict(features)
+    probabilities = gnb.predict_proba(features)
+
+    # combine the features, predictions, and probabilities into a list of tuples
+    features = features.values.tolist()
+    predictions = predictions.tolist()
+    probabilities = [max(p) for p in probabilities.tolist()]
+
+    predictions_with_probabilities = list(zip(features, predictions, probabilities))
+
+    # count the number of passed and failed students
+    num_passed = sum(1 for p in predictions if p.lower() == 'passed')
+    num_failed = sum(1 for p in predictions if p.lower() == 'failed')
 
 
-        # read the CSV file
-        data = pd.read_csv(file)
+    return render_template('batchresultanalysis.html',
+                           predictions_with_probabilities=predictions_with_probabilities,
+                           enumerate=enumerate,
+                           num_passed=num_passed,
+                           num_failed=num_failed)
 
-        # Load data from SQLite database
-        df = pd.read_sql_query("SELECT * FROM datasets", conn)
-
-        # Split the data into features and target variable
-        X = df[['GWA', 'preBoardLETscore']]
-        y = df['outcome']
-
-        # Train the model using Gaussian Naive Bayes algorithm
-        gnb = GaussianNB()
-        gnb.fit(X, y)
-
-        # extract the necessary features
-        features = data[['GWA', 'preBoardLETscore']]
-
-        # predict the classes using the Gaussian Naive Bayes model
-        predictions = gnb.predict(features)
-
-        # convert the predictions to a list
-        predictions = predictions.tolist()
-
-        # combine the predictions with the original data
-        data['predictions'] = predictions
-
-        # group the data by predictions and calculate the count and percentage
-        group_by_predictions = data.groupby('predictions').agg({'predictions': 'count'})
-        group_by_predictions.rename(columns={'predictions': 'count'}, inplace=True)
-        group_by_predictions['percentage'] = group_by_predictions['count'] / data.shape[0] * 100
-
-        # render the results page with the predictions and analysis
-        return render_template('batchresultanalysis.html', predictions=predictions, group_by_predictions=group_by_predictions.to_html())
 
 
 

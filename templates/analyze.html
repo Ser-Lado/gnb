@@ -51,39 +51,39 @@
 
         
             <div class="col3">
-                <strong><p>Below are the summary of the inputed data.</p></strong>
+                <h1>Data Input:</h1>
+                <strong>The data input for this forecasting analysis consists of the following variables:</strong>
                 <br>
-  
-                <strong>Data Input:</strong>
-                <p>The data input for this forecasting analysis consists of the following variables:</p>
-                <p>General Weighted Average (GWA): <strong>{{ GWA }}</strong></p>
-                <p>Pre-board LET Examination Score:  <strong>{{ preBoardLETscore }}</strong></p>
+                <br>
+               
+                <ul>
+                  <li>General Weighted Average (GWA): <strong>{{ GWA }}</strong></li>
+                  <li>Pre-board LET Examination Score: <strong>{{ preBoardLETscore }}</strong></li>
+                </ul>
+                  
                 <hr class="my-4">
 
             </div>
 
                <div class="col3">
-                <strong>Forecasting Results:</strong>
+                <h1>Forecasting Results:</h1>
+                <br>
                 <p>
-                  Based on our analysis, the predicted outcome for the student is <strong><i>"{{ outcome }}"</i></strong>.
-                  This means that, according to the model, the student is likely get a <strong><i>"{{ outcome }}"</i></strong> remarks on their LET exams.
+                  Based on the analysis, the predicted outcome for the student is <strong><i>"{{ outcome }}"</i></strong>  with a probability of <strong>{{ outcome_percentage }}</strong>.
+                  This means that, according to the model, the student is likely to receive a <strong><i>"{{ outcome }}"</i></strong>  remark on their LET exams with a <strong>{{ outcome_percentage }}</strong> probability.
                 </p>
                     <br>
+                    <hr class="my-4">
+                    <h1>Data Analysis:</h1>
                     <br>
-                    <strong>Data Analysis:</strong>
                         <p>
                           This outcome is determined by the Gaussian Naive Bayes algorithm, which takes into account your GWA and pre-board LET scores as predictors of your future performance on the LET exam.
                         </p>
-                      <br>
-                      <p>
-                        It's important to note that while the model's prediction is a useful piece of information, it should not be taken as definitive. There are many factors that can influence a student's exam performance, and a model can only take into account the variables that are included in the dataset it was trained on. It's also possible that there are errors or biases in the data that could affect the accuracy of the model's predictions.
-                        </p>
-                      <br>
-                        <p>
-                        Overall, the predicted outcome of <strong><i>"{{ outcome }}"</i></strong> suggests that the student in question has a relatively <strong>{{ GWA }}</strong> GWA and <strong>{{ preBoardLETscore }}</strong> pre-Board LET exam score, which are indicators for the upcoming exams. However, it's important to remember that the model's prediction is only one piece of information, and should be considered alongside other factors when making decisions about the student's academic performance.
-                        </p>
-                
-            </div>
+                          <p>
+                          It's important to note that while the model's prediction is a useful piece of information, it should not be taken as definitive. There are many factors that can influence a student's exam performance, and a model can only take into account the variables that are included in the dataset it was trained on. It's also possible that there are errors or biases in the data that could affect the accuracy of the model's predictions.
+                          </p>
+             </div>
+
             <br>
             <br>
             <hr class="my-4">

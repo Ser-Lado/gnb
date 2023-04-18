@@ -32,6 +32,17 @@
         </ul>
       </div>
     </nav>
+  
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  
+    <!-- Popper.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  
+    <!-- Bootstrap JS library -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+
 
     <!-- Jumbotron -->
     <div class="jumbotron">
@@ -39,26 +50,59 @@
       <p class="lead">This app allows you to perform Gaussian Naive Bayes classification on your data.</p>
       <hr class="my-4">
 
-        <center><h1>Below are the results of the CSV file uploaded.</h1></center>
-        <hr class="my-4">
-        <h2>Forecasting Reports:</h2>
-        <table>
-          <tr>
-            <th>Student</th>
-            <th>Prediction</th>
-          </tr>
-          {% for prediction in predictions%}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ prediction }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-        <hr class="my-4">
-        <h2>Analysis:</h2>
-        {{ group_by_predictions|safe }}
+
+    <center><h1>Below are the results of the CSV file uploaded.</h1></center>
+     <hr class="my-4">
+         <h2>Forecasting Reports:</h2>
+            <table>
+              <tr>
+                <th>Student</th>
+                <th>GWA</th>
+                <th>Pre-Board LET Score</th>
+                <th>Prediction</th>
+                <th>Probability (%)</th>
+              </tr>
+            
+              {% for i, (features, prediction, probability) in enumerate(predictions_with_probabilities) %}
+
+              <tr>
+                <td>{{ i+1 }}</td>
+                <td>{{ features[0] }}</td>
+                <td>{{ features[1] }}</td>
+                <td>{{ prediction }}</td>
+                <td>{{ probability*100 }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+                <h2>Pass/Fail Analysis:</h2>
+                  <table>
+                    <tr>
+                      <th>Prediction</th>
+                      <th>Number of Students</th>
+                    </tr>
+                    <tr>
+                      <td>Passed</td>
+                      <td>{{ num_passed }}</td>
+                    </tr>
+                    <tr>
+                      <td>Failed</td>
+                      <td>{{ num_failed }}</td>
+                    </tr>
+                  </table>
         <hr class="my-4">
         <br>
+        <p>
+          The Gaussian Naive Bayes algorithm is a probabilistic classification algorithm that is commonly used for binary classification tasks. In this case, the algorithm was used to predict the performance of students, specifically whether they passed or failed, based on certain features or attributes.
+        </p>
+          <p>
+            According to the analysis of the given data, there were <strong>{{ num_passed + num_failed}}</strong> students whose performance was predicted using the Gaussian Naive Bayes algorithm. Out of these <strong>{{ num_passed + num_failed}}</strong> students, <strong>{{ num_passed }}</strong> students were predicted to have passed, while <strong>{{ num_failed }}</strong> students were predicted to have failed.
+          </p>
+            <p>
+              This information can provide valuable insights into the performance of students and can be used for various purposes, such as identifying students who may require additional support or intervention, evaluating the effectiveness of an educational program, or making data-driven decisions to improve student outcomes.
+            </p>
+          <p>
+            It's important to note that the accuracy and reliability of the predictions may depend on the quality and quantity of the data used for training the Gaussian Naive Bayes model, as well as the choice of features or attributes used for prediction. Additionally, further analysis and evaluation of the model's performance, such as calculating <a href="/metrics">metrics</a> like <strong>accuracy</strong>, <strong>precision</strong>, <strong>recall</strong>, and <strong>F1 score</strong>, would be beneficial to assess the overall effectiveness of the model in accurately predicting student performance.
+          </p>
         <a class="btn btn-primary btn-lg" href="/getstarted" role="button">Analyze New Dataset</a>
 
  
