@@ -50,21 +50,22 @@
       <p class="lead">This app allows you to perform Gaussian Naive Bayes classification on your data.</p>
       <hr class="my-4">
 
-      <h3>Enter the students data:</h3>
+      <h3>Analyze single student's data.</h3>
       <br>
       <form action="/analyze" method="post">
           
           <input type="number" step=".01" id="GWA" name="GWA" placeholder="General Weighted Average : 1.0 - 3.0" required max="3.0">
           <br>
           <input type="number" step=".1" id="preBoardLETscore" placeholder="General Average of Pre-board LET Examination Score : 0 - 100" name="preBoardLETscore" required max="100">
-          <br>
+          <br><br>
           <input type="submit" class="btn" value="Analyze">
       </form>
       <br>
       <hr class="my-4">
 
 
-        <h1>Upload a CSV file to forecast batch of students.</h1>
+        <h3>Upload a CSV file to analyze student data in batches.</h3>
+        <br>
         {% if message %}
           <p style="color: red;">{{ message }}</p>
         {% endif %}
@@ -94,7 +95,7 @@
         <br>
         <hr class="my-4">
         <h3>Error on analyzing students data?</h3>
-        <p>Download the CSV file template <a href="{{ url_for('static', filename='uploadBatchTemp.csv') }}" download>here</a>.</p>
+        <p>Download the CSV file template <a href="{{ url_for('static', filename='batchAnalyzeTemplate.csv') }}" download>here</a>.</p>
         
 
    </div>
@@ -131,4 +132,5 @@
             <p>Contact Us</p>
           </div> -->
         </div>
-     
+  </body>
+</html>

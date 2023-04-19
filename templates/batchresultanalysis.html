@@ -70,7 +70,7 @@
                 <td>{{ features[0] }}</td>
                 <td>{{ features[1] }}</td>
                 <td>{{ prediction }}</td>
-                <td>{{ probability*100 }}</td>
+                <td>{{ '{:.2f}'.format(probability*100) }}</td>
               </tr>
               {% endfor %}
             </table>
@@ -103,7 +103,7 @@
           <p>
             It's important to note that the accuracy and reliability of the predictions may depend on the quality and quantity of the data used for training the Gaussian Naive Bayes model, as well as the choice of features or attributes used for prediction. Additionally, further analysis and evaluation of the model's performance, such as calculating <a href="/metrics">metrics</a> like <strong>accuracy</strong>, <strong>precision</strong>, <strong>recall</strong>, and <strong>F1 score</strong>, would be beneficial to assess the overall effectiveness of the model in accurately predicting student performance.
           </p>
-        <a class="btn btn-primary btn-lg" href="/getstarted" role="button">Analyze New Dataset</a>
+        <a class="btn btn-primary btn-lg" href="/getstarted" role="button">Analyze New Data</a>
 
  
     </div>
@@ -141,3 +141,5 @@
           </div> -->
         </div>
      
+  </body>
+</html>
